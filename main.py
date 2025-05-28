@@ -94,7 +94,7 @@ def match_season(user_color, refs):
     return min(refs.keys(), key=lambda s: np.linalg.norm(user_color - refs[s]))
 
 matched = match_season(user_avg, season_refs)
-print(f"\n🌸 You are most likely a {matched} girly!")
+print(f"\n🥰 You are most likely a {matched} girly!")
 
 # Show result palette
 season_palettes = {
