@@ -50,13 +50,13 @@ while True:
 
 
             avg_skin = (get_color(234) + get_color(454)) / 2
-            avg_eye = get_color(468)
+            avg_eye = (get_color(159) + get_color(386)) / 2
             avg_hair = get_color(10)
 
             user_avg = (avg_skin + avg_eye + avg_hair) / 3
 
             # Draw dots for debug
-            for i in [10, 234, 454, 468]:
+            for i in [10, 234, 454, 159, 386]:
                 if i < len(face_landmarks.landmark):
                     pt = face_landmarks.landmark[i]
                     x, y = int(pt.x * w), int(pt.y * h)
@@ -72,7 +72,12 @@ while True:
     if key == 27:  # ESC
         break
     elif key == 32 and user_avg is not None:  # SPACE
+        # Show capture success message
+        cv2.putText(frame, "Captured!", (180, 400), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0, 255, 0), 3)
+        cv2.imshow("Face Scanner", frame)
+        cv2.waitKey(1000)  # Hold for 1 second
         break
+
 
 cap.release()
 cv2.destroyAllWindows()
@@ -89,7 +94,7 @@ def match_season(user_color, refs):
     return min(refs.keys(), key=lambda s: np.linalg.norm(user_color - refs[s]))
 
 matched = match_season(user_avg, season_refs)
-print(f"\n🌸 You are most likely a {matched} palette!")
+print(f"\n🌸 You are most likely a {matched} girly!")
 
 # Show result palette
 season_palettes = {
