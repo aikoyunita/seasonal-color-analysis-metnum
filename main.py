@@ -1,3 +1,4 @@
+
 import cv2
 import mediapipe as mp
 import numpy as np
@@ -40,20 +41,33 @@ while True:
         for face_landmarks in results.multi_face_landmarks:
             # Landmark indices: forehead=10, cheek=234 & 454, eye=468, hair=152 (top)
             h, w, _ = frame.shape
-            def get_color(id): 
-                if id >= len(face_landmarks.landmark):
-                    return np.array([0, 0, 0], dtype=np.float32)
-                pt = face_landmarks.landmark[id]
-                x, y = int(pt.x * w), int(pt.y * h)
-                b, g, r = frame[y, x]
-                return np.array([r, g, b], dtype=np.float32)
+            def get_avg_color(ids):
+                colors = []
+                for idx in ids:
+                    if idx >= len(face_landmarks.landmark):
+                        continue
+                    pt = face_landmarks.landmark[idx]
+                    x, y = int(pt.x * w), int(pt.y * h)
+                    if y >= h or x >= w or y < 0 or x < 0:
+                        continue
+                    b, g, r = frame[y, x]
+                    colors.append(np.array([r, g, b], dtype=np.float32))
+                return np.mean(colors, axis=0) if colors else np.array([0, 0, 0], dtype=np.float32)
 
+            cheek_points = [205, 425]
+            eye_points = [145, 374]  # NEW better eye color landmarks
+            forehead_points = [9, 10]
 
-            avg_skin = (get_color(234) + get_color(454)) / 2
-            avg_eye = (get_color(159) + get_color(386)) / 2
-            avg_hair = get_color(10)
-
+            avg_skin = get_avg_color(cheek_points)
+            avg_eye = get_avg_color(eye_points)
+            avg_hair = get_avg_color(forehead_points)
             user_avg = (avg_skin + avg_eye + avg_hair) / 3
+
+            for i in cheek_points + eye_points + forehead_points:
+                pt = face_landmarks.landmark[i]
+                x, y = int(pt.x * w), int(pt.y * h)
+                cv2.circle(frame, (x, y), 3, (0, 0, 255), -1)
+
 
             # Draw dots for debug
             for i in [10, 234, 454, 159, 386]:
@@ -96,7 +110,7 @@ def match_season(user_color, refs):
 matched = match_season(user_avg, season_refs)
 print(f"\n🥰 You are most likely a {matched} girly!")
 
-# Show result palette
+# Show result palette 
 season_palettes = {
     "Winter": [[255,255,255],[0,0,0],[0,56,168],[116,12,164],[200,0,90],[0,140,140]],
     "Summer": [[230,240,250],[180,200,230],[220,170,200],[190,200,220],[145,180,200],[160,160,180]],
