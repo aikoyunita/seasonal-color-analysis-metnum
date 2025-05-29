@@ -9,7 +9,6 @@ face_mesh = mp_face_mesh.FaceMesh(static_image_mode=False, max_num_faces=1)
 # Webcam capture
 cap = cv2.VideoCapture(1)
 print("📸 Align your face. Press SPACE to capture.")
-print("🔁 Press 'E' to toggle Edge Detection (Numerical Methods feature).")
 
 user_avg = None
 
